@@ -71,5 +71,45 @@ func CreateUser(ctx *gin.Context) {
 }
 
 func UpdateUser(ctx *gin.Context) {
+	userId, ok := ctx.Params.Get("userId")
+	var user entities.User
 
+	if !ok {
+		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "userId not provided or incorrect..."})
+		return
+	}
+
+	errWhenBindingUser := ctx.BindJSON(&user)
+
+	if errWhenBindingUser != nil {
+		ctx.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{"error": errWhenBindingUser.Error()})
+		return
+	}
+
+	userUpdated, errWhenUpdateUser := models.Update(userId, &user)
+
+	if errWhenUpdateUser != nil {
+		ctx.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{"error": errWhenUpdateUser.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, userUpdated)
+}
+
+func DeleteUser(ctx *gin.Context) {
+	userId, ok := ctx.Params.Get("userId")
+
+	if !ok {
+		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "userId not provided or incorrect..."})
+		return
+	}
+
+	userDeleted, errWhenDeleteUser := models.Delete(userId)
+
+	if errWhenDeleteUser != nil {
+		ctx.AbortWithStatusJSON(http.StatusExpectationFailed, gin.H{"error": errWhenDeleteUser})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, userDeleted)
 }

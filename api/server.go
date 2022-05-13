@@ -12,6 +12,7 @@ func Run() {
 	router.GET("/api/users", controllers.GetAllUsers)
 	router.GET("/api/user/:userId", controllers.GetUserById)
 	router.POST("/api/user", controllers.CreateUser)
-	router.DELETE("/api/user/:id")
+	router.PATCH("/api/user/:userId", controllers.UpdateUser)
+	router.DELETE("/api/user/:userId", controllers.DeleteUser)
 	router.Run()
 }

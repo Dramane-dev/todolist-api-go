@@ -76,6 +76,26 @@ func (*UserModel) GetById(userId string) (*entities.User, error) {
 	}
 }
 
+func GetUserById(userId string) (*entities.User, error) {
+	db, err := config.GetDB(os.Getenv("DB_DRIVER"), os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_PORT"), os.Getenv("DB_HOST"), os.Getenv("DB_NAME"))
+
+	if err != nil {
+		return nil, err
+	} else {
+		result, err2 := db.Query("SELECT * FROM users WHERE userId = ?", userId)
+
+		if err2 != nil {
+			return nil, err2
+		} else {
+			var user entities.User
+			for result.Next() {
+				result.Scan(&user.UserId, &user.Lastname, &user.FirstName, &user.Email, &user.Password, &user.MailConfirmed)
+			}
+			return &user, nil
+		}
+	}
+}
+
 func Create(user *entities.User) (*entities.User, error) {
 	db, err := config.GetDB(os.Getenv("DB_DRIVER"), os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_PORT"), os.Getenv("DB_HOST"), os.Getenv("DB_NAME"))
 
@@ -98,6 +118,50 @@ func Create(user *entities.User) (*entities.User, error) {
 			} else {
 				return nil, errorWhenCreateUser
 			}
+		}
+	}
+}
+
+func Update(userId string, user *entities.User) (*entities.User, error) {
+	db, err := config.GetDB(os.Getenv("DB_DRIVER"), os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_PORT"), os.Getenv("DB_HOST"), os.Getenv("DB_NAME"))
+
+	if err != nil {
+		return nil, err
+	} else {
+		_, queryError := db.Query("UPDATE users SET lastname = ?, firstname = ?, email = ? WHERE userId = ?", user.Lastname, user.FirstName, user.Email, userId)
+
+		if queryError != nil {
+			return nil, queryError
+		} else {
+			updtatedUser, err := GetUserById(userId)
+
+			if err != nil {
+				return nil, err
+			}
+
+			return updtatedUser, queryError
+		}
+	}
+}
+
+func Delete(userId string) (string, error) {
+	db, err := config.GetDB(os.Getenv("DB_DRIVER"), os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_PORT"), os.Getenv("DB_HOST"), os.Getenv("DB_NAME"))
+
+	if err != nil {
+		return "", err
+	} else {
+		result, querryError := db.Exec("DELETE FROM users WHERE userId = ?", userId)
+
+		if querryError != nil {
+			return "", querryError
+		} else {
+			rowsDeleted, errorWhenDeleteUser := result.RowsAffected()
+
+			if errorWhenDeleteUser != nil && !(rowsDeleted > 0) {
+				return "", errorWhenDeleteUser
+			}
+
+			return "User deleted successfully ✅", querryError
 		}
 	}
 }

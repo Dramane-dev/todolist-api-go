@@ -5,6 +5,6 @@ type User struct {
 	Lastname      string `json:"lastname"`
 	FirstName     string `json:"firstname"`
 	Email         string `json:"email"`
-	Password      string `json:"password"`
+	Password      string `json:",omitempty"`
 	MailConfirmed bool   `json:"mailConfirmed"`
 }
