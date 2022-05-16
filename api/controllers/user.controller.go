@@ -4,15 +4,13 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/Dramane-dev/todolist-api/api/entities"
 	"github.com/Dramane-dev/todolist-api/api/models"
 
 	"github.com/gin-gonic/gin"
 )
 
-func GetAllUsers(ctx *gin.Context) {
-	var userModel models.UserModel
-	users, _ := userModel.GetAll()
+func (userService *Controller) GetAllUsers(ctx *gin.Context) {
+	users, _ := userService.database.GetAllUsers()
 	data := map[string]interface{}{
 		"users": users,
 	}
@@ -20,8 +18,7 @@ func GetAllUsers(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, data)
 }
 
-func GetUserById(ctx *gin.Context) {
-	var userModel models.UserModel
+func (userService *Controller) GetUserById(ctx *gin.Context) {
 	userId, ok := ctx.Params.Get("userId")
 
 	if !ok {
@@ -29,7 +26,7 @@ func GetUserById(ctx *gin.Context) {
 		return
 	}
 
-	user, errWhenGetUserById := userModel.GetById(userId)
+	user, errWhenGetUserById := userService.database.GetUserById(userId)
 
 	if errWhenGetUserById != nil {
 		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{
@@ -49,8 +46,8 @@ func GetUserById(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, data)
 }
 
-func CreateUser(ctx *gin.Context) {
-	var user entities.User
+func (userService *Controller) Signup(ctx *gin.Context) {
+	var user models.User
 
 	err := ctx.BindJSON(&user)
 
@@ -60,7 +57,7 @@ func CreateUser(ctx *gin.Context) {
 		return
 	}
 
-	usr, err2 := models.Create(&user)
+	usr, err2 := userService.database.Signup(&user)
 
 	if err2 != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err2.Error()})
@@ -70,9 +67,30 @@ func CreateUser(ctx *gin.Context) {
 	}
 }
 
-func UpdateUser(ctx *gin.Context) {
+func (userService *Controller) Signin(ctx *gin.Context) {
+	var userCredentials models.UserCredentials
+	err := ctx.BindJSON(&userCredentials)
+
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
+	token, errWhenUserSigning := userService.database.Signin(&userCredentials)
+
+	if errWhenUserSigning != nil {
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": errWhenUserSigning.Error()})
+		return
+	} else {
+		userCredentials.Token = *token
+		ctx.JSON(http.StatusOK, gin.H{"user": userCredentials})
+		return
+	}
+}
+
+func (userService *Controller) UpdateUser(ctx *gin.Context) {
 	userId, ok := ctx.Params.Get("userId")
-	var user entities.User
+	user := make(map[string]interface{})
 
 	if !ok {
 		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "userId not provided or incorrect..."})
@@ -86,7 +104,7 @@ func UpdateUser(ctx *gin.Context) {
 		return
 	}
 
-	userUpdated, errWhenUpdateUser := models.Update(userId, &user)
+	userUpdated, errWhenUpdateUser := userService.database.UpdateUser(userId, user)
 
 	if errWhenUpdateUser != nil {
 		ctx.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{"error": errWhenUpdateUser.Error()})
@@ -96,7 +114,7 @@ func UpdateUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, userUpdated)
 }
 
-func DeleteUser(ctx *gin.Context) {
+func (userService *Controller) DeleteUser(ctx *gin.Context) {
 	userId, ok := ctx.Params.Get("userId")
 
 	if !ok {
@@ -104,7 +122,7 @@ func DeleteUser(ctx *gin.Context) {
 		return
 	}
 
-	userDeleted, errWhenDeleteUser := models.Delete(userId)
+	userDeleted, errWhenDeleteUser := userService.database.DeleteUser(userId)
 
 	if errWhenDeleteUser != nil {
 		ctx.AbortWithStatusJSON(http.StatusExpectationFailed, gin.H{"error": errWhenDeleteUser})
