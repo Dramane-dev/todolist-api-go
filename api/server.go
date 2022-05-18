@@ -7,7 +7,6 @@ import (
 
 	"github.com/Dramane-dev/todolist-api/api/config/mysql"
 	"github.com/Dramane-dev/todolist-api/api/controllers"
-	"github.com/Dramane-dev/todolist-api/api/middlewares"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -15,17 +14,18 @@ import (
 
 func Run() {
 	databaseConnection := mysql.New(os.Getenv("DB_DRIVER"), os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_PORT"), os.Getenv("DB_HOST"), os.Getenv("DB_NAME"))
-	userService := controllers.New(databaseConnection)
-
 	router := gin.Default()
-	router.POST("/api/user/signup", userService.Signup)
-	router.POST("/api/user/signin", userService.Signin)
-	router.Use(middlewares.VerifyToken())
-	router.GET("/api/health-check", controllers.HealthCheckController)
-	router.GET("/api/users", userService.GetAllUsers)
-	router.GET("/api/user/:userId", userService.GetUserById)
-	router.PATCH("/api/user/:userId", userService.UpdateUser)
-	router.DELETE("/api/user/:userId", userService.DeleteUser)
+	userServiceErr := controllers.NewUserDatabaseInstance(router, databaseConnection)
+	projectServiceErr := controllers.NewProjectDatabaseInstance(router, databaseConnection)
+
+	if userServiceErr != nil {
+		panic(userServiceErr)
+	}
+
+	if projectServiceErr != nil {
+		panic(projectServiceErr)
+	}
+
 	router.Run()
 }
 

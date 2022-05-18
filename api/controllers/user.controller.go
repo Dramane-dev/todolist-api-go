@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (userService *Controller) GetAllUsers(ctx *gin.Context) {
+func (userService *UserController) GetAllUsers(ctx *gin.Context) {
 	users, _ := userService.database.GetAllUsers()
 	data := map[string]interface{}{
 		"users": users,
@@ -18,7 +18,7 @@ func (userService *Controller) GetAllUsers(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, data)
 }
 
-func (userService *Controller) GetUserById(ctx *gin.Context) {
+func (userService *UserController) GetUserById(ctx *gin.Context) {
 	userId, ok := ctx.Params.Get("userId")
 
 	if !ok {
@@ -46,7 +46,7 @@ func (userService *Controller) GetUserById(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, data)
 }
 
-func (userService *Controller) Signup(ctx *gin.Context) {
+func (userService *UserController) Signup(ctx *gin.Context) {
 	var user models.User
 
 	err := ctx.BindJSON(&user)
@@ -67,7 +67,7 @@ func (userService *Controller) Signup(ctx *gin.Context) {
 	}
 }
 
-func (userService *Controller) Signin(ctx *gin.Context) {
+func (userService *UserController) Signin(ctx *gin.Context) {
 	var userCredentials models.UserCredentials
 	err := ctx.BindJSON(&userCredentials)
 
@@ -88,7 +88,7 @@ func (userService *Controller) Signin(ctx *gin.Context) {
 	}
 }
 
-func (userService *Controller) UpdateUser(ctx *gin.Context) {
+func (userService *UserController) UpdateUser(ctx *gin.Context) {
 	userId, ok := ctx.Params.Get("userId")
 	user := make(map[string]interface{})
 
@@ -114,7 +114,7 @@ func (userService *Controller) UpdateUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, userUpdated)
 }
 
-func (userService *Controller) DeleteUser(ctx *gin.Context) {
+func (userService *UserController) DeleteUser(ctx *gin.Context) {
 	userId, ok := ctx.Params.Get("userId")
 
 	if !ok {

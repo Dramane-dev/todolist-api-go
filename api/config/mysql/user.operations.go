@@ -11,7 +11,7 @@ import (
 )
 
 type User struct {
-	UserId        string `gorm:"column:userId" json:"userId"`
+	UserId        string `gorm:"column:userId;primaryKey" json:"userId"`
 	Lastname      string `gorm:"column:lastname" json:"lastname"`
 	FirstName     string `gorm:"column:firstname" json:"firstname"`
 	Email         string `gorm:"column:email" json:"email"`
@@ -20,7 +20,8 @@ type User struct {
 
 func (db *MySQLDatabase) GetAllUsers() ([]*models.UserInformations, error) {
 	var users []*models.UserInformations
-	errWhenGetAllUsers := db.connection.Model(&User{}).Find(&users).Error
+
+	errWhenGetAllUsers := db.connection.Preload("Projects").Model(&User{}).Find(&users).Error
 
 	if errWhenGetAllUsers != nil {
 		return nil, errWhenGetAllUsers
@@ -31,7 +32,7 @@ func (db *MySQLDatabase) GetAllUsers() ([]*models.UserInformations, error) {
 
 func (db *MySQLDatabase) GetUserById(userId string) (*models.UserInformations, error) {
 	var user models.UserInformations
-	errWhenGetUserById := db.connection.Model(&User{}).First(&user, "userId = ?", userId).Error
+	errWhenGetUserById := db.connection.Preload("Projects").Model(&User{}).First(&user, "userId = ?", userId).Error
 
 	if errWhenGetUserById != nil {
 		return nil, errWhenGetUserById
