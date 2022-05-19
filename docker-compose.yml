@@ -1,0 +1,49 @@
+version: '3.1'
+
+networks:
+  simplytodoGo:
+    driver: bridge
+
+services:
+  mysqlDatabase:
+    image: mysql:latest
+    networks:
+      - simplytodoGo
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    expose:
+      - ${DB_PORT}
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    environment:
+      MYSQL_DATABASE: ${DB_DRIVER}
+      MYSQL_ALLOW_EMPTY_PASSWORD: ok
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_HOST: '%'
+    volumes:
+      - mysql-data:/data/db
+      - "./procedure.sql:/docker-entrypoint-initdb.d/procedure.sql"
+  simplytodo-go:
+    depends_on:
+      - mysqlDatabase
+    image: simplytodo-go
+    build: 
+      context: ./
+      dockerfile: Dockerfile
+    networks:
+      - simplytodoGo
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET}
+      DB_HOST: ${DB_HOST}
+      DB_DRIVER: ${DB_DRIVER}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_PORT: ${DB_PORT}
+volumes:
+  mysql-data:
+    driver: local

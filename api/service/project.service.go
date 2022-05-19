@@ -1,4 +1,4 @@
-package config
+package service
 
 import "github.com/Dramane-dev/todolist-api/api/models"
 
