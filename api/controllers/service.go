@@ -1,25 +1,24 @@
 package controllers
 
 import (
-	"github.com/Dramane-dev/todolist-api/api/config"
 	"github.com/Dramane-dev/todolist-api/api/middlewares"
-
+	"github.com/Dramane-dev/todolist-api/api/service"
 	"github.com/gin-gonic/gin"
 )
 
 type UserController struct {
-	database config.UserService
+	database service.UserService
 }
 
 type ProjectController struct {
-	database config.ProjectService
+	database service.ProjectService
 }
 
 // router.Use(middlewares.VerifyToken())
 
 var jwtMiddleware = middlewares.VerifyToken()
 
-func NewUserDatabaseInstance(router *gin.Engine, database config.UserService) error {
+func NewUserDatabaseInstance(router *gin.Engine, database service.UserService) error {
 	userService := &UserController{
 		database: database,
 	}
@@ -36,7 +35,7 @@ func NewUserDatabaseInstance(router *gin.Engine, database config.UserService) er
 	return nil
 }
 
-func NewProjectDatabaseInstance(router *gin.Engine, database config.ProjectService) error {
+func NewProjectDatabaseInstance(router *gin.Engine, database service.ProjectService) error {
 	projectService := &ProjectController{
 		database: database,
 	}
