@@ -21,7 +21,7 @@ type User struct {
 func (db *MySQLDatabase) GetAllUsers() ([]*models.UserInformations, error) {
 	var users []*models.UserInformations
 
-	errWhenGetAllUsers := db.connection.Preload("Projects").Model(&User{}).Find(&users).Error
+	errWhenGetAllUsers := db.connection.Preload("Projects.Tasks").Model(&User{}).Find(&users).Error
 
 	if errWhenGetAllUsers != nil {
 		return nil, errWhenGetAllUsers

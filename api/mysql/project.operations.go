@@ -1,25 +1,16 @@
 package mysql
 
 import (
+	"errors"
+
 	"github.com/Dramane-dev/todolist-api/api/models"
 	"github.com/google/uuid"
 )
 
 func (db *MySQLDatabase) GetAllProjects() ([]*models.Project, error) {
 	var projects []*models.Project
-	// var user *models.User
 
-	errWhenGettingProject := db.connection.Find(&projects).Error
-
-	// for i := range projects {
-	// 	errWhenGettingUser := db.connection.Model(&user).Where("userId = ?", projects[i].UserId).Find(&user).Error
-
-	// 	if errWhenGettingUser == nil {
-	// 		projects[i].UserLastname = user.Lastname
-	// 		projects[i].UserFirstname = user.FirstName
-	// 		projects[i].UserEmail = user.Email
-	// 	}
-	// }
+	errWhenGettingProject := db.connection.Preload("Tasks").Model(&models.Project{}).Find(&projects).Error
 
 	if errWhenGettingProject != nil {
 		return nil, errWhenGettingProject
@@ -31,7 +22,7 @@ func (db *MySQLDatabase) GetAllProjects() ([]*models.Project, error) {
 func (db *MySQLDatabase) GetAllProjectsByUserId(userId string) ([]*models.Project, error) {
 	var projects []*models.Project
 
-	errWhenGettingProject := db.connection.Model(&models.Project{}).Find(&projects).Error
+	errWhenGettingProject := db.connection.Preload("Tasks").Model(&models.Project{}).Where("userId = ?", userId).Find(&projects).Error
 
 	if errWhenGettingProject != nil {
 		return nil, errWhenGettingProject
@@ -41,8 +32,15 @@ func (db *MySQLDatabase) GetAllProjectsByUserId(userId string) ([]*models.Projec
 }
 
 func (db *MySQLDatabase) GetProjectById(projectId string) (*models.Project, error) {
-	var projects *models.Project
-	return projects, nil
+	var project *models.Project
+
+	errWhenGetProjectById := db.connection.Preload("Tasks").Model(&models.Project{}).Where("projectId = ?", projectId).Find(&project).Error
+
+	if errWhenGetProjectById != nil {
+		return nil, errWhenGetProjectById
+	}
+
+	return project, nil
 }
 
 func (db *MySQLDatabase) CreateProject(project *models.Project) (*models.Project, error) {
@@ -56,12 +54,29 @@ func (db *MySQLDatabase) CreateProject(project *models.Project) (*models.Project
 	return project, nil
 }
 
-func (db *MySQLDatabase) UpdateProject(projectId string) (*models.Project, error) {
-	var projects *models.Project
-	return projects, nil
+func (db *MySQLDatabase) UpdateProject(projectId string, project map[string]interface{}) (*models.Project, error) {
+	errWhenUpdateProject := db.connection.Model(&models.Project{}).Where("projectId = ?", projectId).Updates(project).Error
+
+	if errWhenUpdateProject != nil {
+		return nil, errWhenUpdateProject
+	}
+	return db.GetProjectById(projectId)
 }
 
 func (db *MySQLDatabase) DeleteProject(projectId string) (*string, error) {
-	var projects string = ""
-	return &projects, nil
+	project, _ := db.GetProjectById(projectId)
+
+	if !(len(project.ProjectId) > 0) {
+		return nil, errors.New("project not found ...❌")
+	}
+
+	errWhenDeleteProject := db.connection.Model(&models.Project{}).Where("projectId = ?", projectId).Delete(projectId).Error
+
+	if errWhenDeleteProject != nil {
+		return nil, errWhenDeleteProject
+	}
+
+	var strResponse string = "Project deleted successfully ✅"
+
+	return &strResponse, errWhenDeleteProject
 }

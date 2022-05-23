@@ -15,6 +15,7 @@ type MySQLDatabase struct {
 
 var _ service.UserService = &MySQLDatabase{}
 var _ service.ProjectService = &MySQLDatabase{}
+var _ service.TaskService = &MySQLDatabase{}
 
 func New(DatabaseDriver, DatabaseUser, DatabasePassword, DatabasePort, DatabaseHost, DatabaseName string) *MySQLDatabase {
 	// databaseUrl := DatabaseUser + ":" + DatabasePassword + "@/" + DatabaseName
@@ -37,11 +38,3 @@ func New(DatabaseDriver, DatabaseUser, DatabasePassword, DatabasePort, DatabaseH
 		connection: sqlGormDatabase,
 	}
 }
-
-// func MigrateInterfaces(sqlGormDatabase *gorm.DB, user *models.User, project *models.Project) {
-// 	errWhenAutoMigrateType := sqlGormDatabase.AutoMigrate(&models.User{}, &models.Project{}).Error()
-
-// 	if len(errWhenAutoMigrateType) > 0 {
-// 		panic(errWhenAutoMigrateType)
-// 	}
-// }

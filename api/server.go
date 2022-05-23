@@ -17,6 +17,7 @@ func Run() {
 	router := gin.Default()
 	userServiceErr := controllers.NewUserDatabaseInstance(router, databaseConnection)
 	projectServiceErr := controllers.NewProjectDatabaseInstance(router, databaseConnection)
+	taskServiceErr := controllers.NewTaskDatabaseInstance(router, databaseConnection)
 
 	if userServiceErr != nil {
 		panic(userServiceErr)
@@ -24,6 +25,10 @@ func Run() {
 
 	if projectServiceErr != nil {
 		panic(projectServiceErr)
+	}
+
+	if taskServiceErr != nil {
+		panic(taskServiceErr)
 	}
 
 	router.Run()

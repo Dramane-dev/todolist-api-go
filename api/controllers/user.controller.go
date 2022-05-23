@@ -22,7 +22,7 @@ func (userService *UserController) GetUserById(ctx *gin.Context) {
 	userId, ok := ctx.Params.Get("userId")
 
 	if !ok {
-		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "userId not provided or incorrect"})
+		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "userId not provided or incorrect ...❌"})
 		return
 	}
 
@@ -93,7 +93,7 @@ func (userService *UserController) UpdateUser(ctx *gin.Context) {
 	user := make(map[string]interface{})
 
 	if !ok {
-		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "userId not provided or incorrect..."})
+		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "userId not provided or incorrect...❌"})
 		return
 	}
 
@@ -118,7 +118,7 @@ func (userService *UserController) DeleteUser(ctx *gin.Context) {
 	userId, ok := ctx.Params.Get("userId")
 
 	if !ok {
-		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "userId not provided or incorrect..."})
+		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "userId not provided or incorrect...❌"})
 		return
 	}
 

@@ -1,5 +1,7 @@
 # Simply todo in GO
 
+Une API RESTFUL simple vous permettant d'organiser vos projets personnels.
+
 <p align="center">
   <img 
         alt="GO" 

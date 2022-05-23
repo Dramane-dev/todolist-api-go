@@ -14,7 +14,9 @@ type ProjectController struct {
 	database service.ProjectService
 }
 
-// router.Use(middlewares.VerifyToken())
+type TaskController struct {
+	database service.TaskService
+}
 
 var jwtMiddleware = middlewares.VerifyToken()
 
@@ -46,6 +48,21 @@ func NewProjectDatabaseInstance(router *gin.Engine, database service.ProjectServ
 	router.POST("/api/project/:userId", jwtMiddleware, projectService.CreateProject)
 	router.PATCH("/api/project/:projectId", jwtMiddleware, projectService.UpdateProject)
 	router.DELETE("/api/project/:projectId", jwtMiddleware, projectService.DeleteProject)
+
+	return nil
+}
+
+func NewTaskDatabaseInstance(router *gin.Engine, database service.TaskService) error {
+	taskService := &TaskController{
+		database: database,
+	}
+
+	router.GET("/api/tasks", jwtMiddleware, taskService.GetAllTasks)
+	router.GET("/api/tasks/:projectId", jwtMiddleware, taskService.GetAllTasksByProjectId)
+	router.GET("/api/task/:taskId", jwtMiddleware, taskService.GetTaskById)
+	router.POST("/api/task/:projectId", jwtMiddleware, taskService.CreateTask)
+	router.PATCH("/api/task/:taskId", jwtMiddleware, taskService.UpdateTask)
+	router.DELETE("/api/task/:taskId", jwtMiddleware, taskService.DeleteTask)
 
 	return nil
 }

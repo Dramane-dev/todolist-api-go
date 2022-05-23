@@ -21,3 +21,14 @@ CREATE TABLE projects(
     PRIMARY KEY(projectId),
     FOREIGN KEY(userId) REFERENCES users(userId) ON DELETE CASCADE
 );
+
+CREATE TABLE tasks(
+    taskId VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    description VARCHAR(255),
+    status VARCHAR(20) DEFAULT "todo",
+    created_at VARCHAR(255),
+    projectId VARCHAR(255) NOT NULL,
+    PRIMARY KEY(taskId),
+    FOREIGN KEY(projectId) REFERENCES projects(projectId) ON DELETE CASCADE
+);

@@ -8,11 +8,26 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func (projectService *ProjectController) GetAllProjects(ctx *gin.Context) {
+	projects, errWhenGetAllProjectByUserId := projectService.database.GetAllProjects()
+
+	if errWhenGetAllProjectByUserId != nil {
+		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": errWhenGetAllProjectByUserId})
+		return
+	}
+
+	data := map[string]interface{}{
+		"projects": projects,
+	}
+
+	ctx.JSON(http.StatusOK, data)
+}
+
 func (projectService *ProjectController) GetAllProjectsByUserId(ctx *gin.Context) {
 	userId, ok := ctx.Params.Get("userId")
 
 	if !ok {
-		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "userId not provided or incorrect"})
+		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "userId not provided or incorrect...❌"})
 		return
 	}
 
@@ -29,41 +44,30 @@ func (projectService *ProjectController) GetAllProjectsByUserId(ctx *gin.Context
 	ctx.JSON(http.StatusOK, data)
 }
 
-func (projectService *ProjectController) GetAllProjects(ctx *gin.Context) {
-	projects, errWhenGetAllProjectByUserId := projectService.database.GetAllProjects()
-
-	if errWhenGetAllProjectByUserId != nil {
-		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": errWhenGetAllProjectByUserId})
-		return
-	}
-
-	data := map[string]interface{}{
-		"projects": projects,
-	}
-
-	ctx.JSON(http.StatusOK, data)
-}
-
 func (projectService *ProjectController) GetProjectById(ctx *gin.Context) {
-	projectID, ok := ctx.Params.Get("projectId")
+	projectId, ok := ctx.Params.Get("projectId")
 
 	if !ok {
-		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "projectId not provided or incorrect"})
+		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "projectId not provided or incorrect...❌"})
 		return
 	}
 
-	project, errWhenGetProjectById := projectService.database.GetProjectById(projectID)
+	project, errWhenGetProjectById := projectService.database.GetProjectById(projectId)
 
 	if errWhenGetProjectById != nil {
 		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": errWhenGetProjectById})
 		return
 	}
 
-	data := map[string]interface{}{
-		"project": project,
+	if len(project.ProjectId) > 0 {
+		data := map[string]interface{}{
+			"project": project,
+		}
+
+		ctx.JSON(http.StatusOK, data)
 	}
 
-	ctx.JSON(http.StatusOK, data)
+	ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "Project not found...❌"})
 }
 
 func (projectService *ProjectController) CreateProject(ctx *gin.Context) {
@@ -96,34 +100,41 @@ func (projectService *ProjectController) CreateProject(ctx *gin.Context) {
 
 func (projectService *ProjectController) UpdateProject(ctx *gin.Context) {
 	projectId, ok := ctx.Params.Get("projectId")
+	project := make(map[string]interface{})
 
 	if !ok {
-		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "projectId not provided or incorrect"})
+		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "projectId not provided or incorrect...❌"})
 		return
 	}
 
-	project, errWhenUpdateProject := projectService.database.UpdateProject(projectId)
+	errWhenBindingProjectJson := ctx.BindJSON(&project)
+
+	if errWhenBindingProjectJson != nil {
+		ctx.AbortWithStatusJSON(http.StatusExpectationFailed, gin.H{"error": errWhenBindingProjectJson.Error()})
+	}
+
+	projectUpdated, errWhenUpdateProject := projectService.database.UpdateProject(projectId, project)
 
 	if errWhenUpdateProject != nil {
 		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": errWhenUpdateProject})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, project)
+	ctx.JSON(http.StatusOK, projectUpdated)
 }
 
 func (projectService *ProjectController) DeleteProject(ctx *gin.Context) {
 	projectId, ok := ctx.Params.Get("projectId")
 
 	if !ok {
-		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "projectId not provided or incorrect"})
+		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "projectId not provided or incorrect...❌"})
 		return
 	}
 
 	project, errWhenDeleteProject := projectService.database.DeleteProject(projectId)
 
 	if errWhenDeleteProject != nil {
-		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": errWhenDeleteProject})
+		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": errWhenDeleteProject.Error()})
 		return
 	}
 
