@@ -1,19 +1,16 @@
 package api
 
 import (
-	"fmt"
-	"log"
 	"os"
 
 	"github.com/Dramane-dev/todolist-api/api/controllers"
 	"github.com/Dramane-dev/todolist-api/api/mysql"
-	"github.com/joho/godotenv"
 
 	"github.com/gin-gonic/gin"
 )
 
 func Run() {
-	databaseConnection := mysql.New(os.Getenv("DB_DRIVER"), os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_PORT"), os.Getenv("DB_HOST_DEV"), os.Getenv("DB_NAME"))
+	databaseConnection := mysql.New(os.Getenv("DB_DRIVER"), os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_PORT"), os.Getenv("DB_HOST"), os.Getenv("DB_NAME"))
 	router := gin.Default()
 	router.MaxMultipartMemory = 500 << 20
 	userServiceErr := controllers.NewUserDatabaseInstance(router, databaseConnection)
@@ -40,16 +37,16 @@ func Run() {
 	router.Run()
 }
 
-func init() {
-	if err := godotenv.Load(); err != nil {
-		log.Fatalf(".env not found... %v", err)
-	}
+// func init() {
+// 	if err := godotenv.Load(); err != nil {
+// 		log.Fatalf(".env not found... %v", err)
+// 	}
 
-	err := godotenv.Load()
+// 	err := godotenv.Load()
 
-	if err != nil {
-		log.Fatalf("Error when getting .env file, %v", err)
-	} else {
-		fmt.Println("[ .env file getted successfully ✅ ]")
-	}
-}
+// 	if err != nil {
+// 		log.Fatalf("Error when getting .env file, %v", err)
+// 	} else {
+// 		fmt.Println("[ .env file getted successfully ✅ ]")
+// 	}
+// }
