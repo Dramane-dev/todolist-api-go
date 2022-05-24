@@ -16,6 +16,7 @@ type MySQLDatabase struct {
 var _ service.UserService = &MySQLDatabase{}
 var _ service.ProjectService = &MySQLDatabase{}
 var _ service.TaskService = &MySQLDatabase{}
+var _ service.AttachmentService = &MySQLDatabase{}
 
 func New(DatabaseDriver, DatabaseUser, DatabasePassword, DatabasePort, DatabaseHost, DatabaseName string) *MySQLDatabase {
 	// databaseUrl := DatabaseUser + ":" + DatabasePassword + "@/" + DatabaseName

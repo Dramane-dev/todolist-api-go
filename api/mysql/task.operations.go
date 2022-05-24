@@ -45,7 +45,7 @@ func (db *MySQLDatabase) GetTaskById(taskId string) (*models.Task, error) {
 }
 
 func (db *MySQLDatabase) CreateTask(task *models.Task) (*models.Task, error) {
-	task.TaskId = uuid.NewString()
+	task.TaskId = "TSK" + uuid.NewString()
 	currentDate := time.Now()
 	task.CreatedAt = strings.Split(currentDate.String(), ".")[0]
 	errWhenCreateTask := db.connection.Model(&models.Task{}).Create(task).Error

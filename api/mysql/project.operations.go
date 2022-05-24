@@ -10,7 +10,7 @@ import (
 func (db *MySQLDatabase) GetAllProjects() ([]*models.Project, error) {
 	var projects []*models.Project
 
-	errWhenGettingProject := db.connection.Preload("Tasks").Model(&models.Project{}).Find(&projects).Error
+	errWhenGettingProject := db.connection.Preload("Tasks").Preload("Attachments").Model(&models.Project{}).Find(&projects).Error
 
 	if errWhenGettingProject != nil {
 		return nil, errWhenGettingProject
@@ -22,7 +22,7 @@ func (db *MySQLDatabase) GetAllProjects() ([]*models.Project, error) {
 func (db *MySQLDatabase) GetAllProjectsByUserId(userId string) ([]*models.Project, error) {
 	var projects []*models.Project
 
-	errWhenGettingProject := db.connection.Preload("Tasks").Model(&models.Project{}).Where("userId = ?", userId).Find(&projects).Error
+	errWhenGettingProject := db.connection.Preload("Tasks").Preload("Attachments").Model(&models.Project{}).Where("userId = ?", userId).Find(&projects).Error
 
 	if errWhenGettingProject != nil {
 		return nil, errWhenGettingProject
@@ -34,7 +34,7 @@ func (db *MySQLDatabase) GetAllProjectsByUserId(userId string) ([]*models.Projec
 func (db *MySQLDatabase) GetProjectById(projectId string) (*models.Project, error) {
 	var project *models.Project
 
-	errWhenGetProjectById := db.connection.Preload("Tasks").Model(&models.Project{}).Where("projectId = ?", projectId).Find(&project).Error
+	errWhenGetProjectById := db.connection.Preload("Tasks").Preload("Attachments").Model(&models.Project{}).Where("projectId = ?", projectId).Find(&project).Error
 
 	if errWhenGetProjectById != nil {
 		return nil, errWhenGetProjectById
@@ -44,12 +44,13 @@ func (db *MySQLDatabase) GetProjectById(projectId string) (*models.Project, erro
 }
 
 func (db *MySQLDatabase) CreateProject(project *models.Project) (*models.Project, error) {
-	project.ProjectId = uuid.NewString()
+	project.ProjectId = "PJT" + uuid.NewString()
 	errWhenCreateProject := db.connection.Model(&models.Project{}).Create(project).Error
 
 	if errWhenCreateProject != nil {
 		return nil, errWhenCreateProject
 	}
+	project, _ = db.GetProjectById(project.ProjectId)
 
 	return project, nil
 }

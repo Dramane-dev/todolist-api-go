@@ -65,6 +65,7 @@ func (projectService *ProjectController) GetProjectById(ctx *gin.Context) {
 		}
 
 		ctx.JSON(http.StatusOK, data)
+		return
 	}
 
 	ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "Project not found...❌"})

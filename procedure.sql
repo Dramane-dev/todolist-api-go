@@ -32,3 +32,13 @@ CREATE TABLE tasks(
     PRIMARY KEY(taskId),
     FOREIGN KEY(projectId) REFERENCES projects(projectId) ON DELETE CASCADE
 );
+
+CREATE TABLE attachments(
+    attachmentId VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    type VARCHAR(255),
+    path VARCHAR(255) NOT NULL,
+    projectId VARCHAR(255) NOT NULL,
+    PRIMARY KEY(attachmentId),
+    FOREIGN KEY(projectId) REFERENCES projects(projectId) ON DELETE CASCADE
+);

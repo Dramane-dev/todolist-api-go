@@ -18,6 +18,10 @@ type TaskController struct {
 	database service.TaskService
 }
 
+type AttachmentController struct {
+	database service.AttachmentService
+}
+
 var jwtMiddleware = middlewares.VerifyToken()
 
 func NewUserDatabaseInstance(router *gin.Engine, database service.UserService) error {
@@ -63,6 +67,20 @@ func NewTaskDatabaseInstance(router *gin.Engine, database service.TaskService) e
 	router.POST("/api/task/:projectId", jwtMiddleware, taskService.CreateTask)
 	router.PATCH("/api/task/:taskId", jwtMiddleware, taskService.UpdateTask)
 	router.DELETE("/api/task/:taskId", jwtMiddleware, taskService.DeleteTask)
+
+	return nil
+}
+
+func NewAttachmentDatabaseInstance(router *gin.Engine, database service.AttachmentService) error {
+	attachmentService := &AttachmentController{
+		database: database,
+	}
+
+	router.GET("/api/attachments", jwtMiddleware, attachmentService.GetAllAttachments)
+	router.GET("/api/attachments/:projectId", jwtMiddleware, attachmentService.GetAllAttachmentsByProjectId)
+	router.GET("/api/attachment/:attachmentId", jwtMiddleware, attachmentService.GetAttachmentById)
+	router.POST("/api/attachment/:projectId", jwtMiddleware, attachmentService.UploadAttachment)
+	router.DELETE("/api/attachment/:attachmentId", jwtMiddleware, attachmentService.DeleteAttachment)
 
 	return nil
 }
