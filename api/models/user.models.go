@@ -10,12 +10,13 @@ type User struct {
 }
 
 type UserInformations struct {
-	UserId        string     `gorm:"column:userId;primaryKey" json:"userId"`
-	Lastname      string     `gorm:"column:lastname" json:"lastname"`
-	FirstName     string     `gorm:"column:firstname" json:"firstname"`
-	Email         string     `gorm:"column:email" json:"email"`
-	MailConfirmed bool       `gorm:"column:mailConfirmed" json:"mailConfirmed"`
-	Projects      []*Project `gorm:"ForeignKey:userId"`
+	UserId        string        `gorm:"column:userId;primaryKey" json:"userId"`
+	Lastname      string        `gorm:"column:lastname" json:"lastname"`
+	FirstName     string        `gorm:"column:firstname" json:"firstname"`
+	Email         string        `gorm:"column:email" json:"email"`
+	MailConfirmed bool          `gorm:"column:mailConfirmed" json:"mailConfirmed"`
+	Projects      []*Project    `gorm:"ForeignKey:userId"`
+	Subscription  *Subscription `gorm:"ForeignKey:userId"`
 }
 
 type UserCredentials struct {

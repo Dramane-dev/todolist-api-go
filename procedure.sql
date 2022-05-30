@@ -42,3 +42,13 @@ CREATE TABLE attachments(
     PRIMARY KEY(attachmentId),
     FOREIGN KEY(projectId) REFERENCES projects(projectId) ON DELETE CASCADE
 );
+
+CREATE TABLE subscriptions(
+    subscriptionId VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    description VARCHAR(255),
+    amount VARCHAR(255) NOT NULL,
+    userId VARCHAR(255) NOT NULL,
+    PRIMARY KEY(subscriptionId),
+    FOREIGN KEY(userId) REFERENCES users(userId) ON DELETE CASCADE
+);
