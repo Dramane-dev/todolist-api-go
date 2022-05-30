@@ -95,6 +95,7 @@ func NewPaymentDatabaseInstance(router *gin.Engine, database service.PaymentServ
 	}
 
 	router.POST("/api/subscribe/:userId", jwtMiddleware, paymentService.Subscribe)
+	router.DELETE("/api/unsubscribe/:subscriptionId", jwtMiddleware, paymentService.UnSubscribe)
 
 	return nil
 }

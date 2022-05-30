@@ -41,3 +41,14 @@ func (db *MySQLDatabase) Subscribe(userId string, subscription *models.Subscript
 
 	return db.GetSubscriptionById(subscription.SubscriptionId)
 }
+
+func (db *MySQLDatabase) UnSubscribe(subscriptionId string) (*string, error) {
+	errWhenUnSubscription := db.connection.Model(&models.Subscription{}).Where("subscriptionId = ?", subscriptionId).Delete(subscriptionId).Error
+
+	if errWhenUnSubscription != nil {
+		return nil, errWhenUnSubscription
+	}
+
+	response := "Unsubscribe successfully ✅"
+	return &response, nil
+}

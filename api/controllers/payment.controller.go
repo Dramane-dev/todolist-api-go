@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 
@@ -56,7 +57,8 @@ func (paymentService *PaymentController) Subscribe(ctx *gin.Context) {
 
 	userAlreadySubscribe, userNotSubscribe := paymentService.database.GetSubscriptionByUserId(userId)
 
-	if userNotSubscribe != nil {
+	if userNotSubscribe != nil || !(len(userAlreadySubscribe.SubscriptionId) > 0) {
+		fmt.Println("ok cool")
 		stripeApiKey := os.Getenv("STRIPE_TEST_KEY")
 		stripe.Key = stripeApiKey
 
@@ -84,9 +86,28 @@ func (paymentService *PaymentController) Subscribe(ctx *gin.Context) {
 			"message":      "Payment has been sucessfully received ✅",
 			"subscription": subscriptionSaved,
 		})
+		return
 	}
+
 	ctx.JSON(http.StatusOK, gin.H{
 		"message":      "User already subscribe ✅",
 		"subscription": userAlreadySubscribe,
 	})
+}
+
+func (paymentService *PaymentController) UnSubscribe(ctx *gin.Context) {
+	subscriptionId, ok := ctx.Params.Get("subscriptionId")
+
+	if !ok {
+		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": ""})
+		return
+	}
+
+	userUnsubscribe, errWhenUnSubscribeUser := paymentService.database.UnSubscribe(subscriptionId)
+
+	if errWhenUnSubscribeUser != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": errWhenUnSubscribeUser})
+		return
+	}
+	ctx.JSON(http.StatusOK, userUnsubscribe)
 }
