@@ -2,6 +2,7 @@ package functions
 
 import (
 	"image"
+	"log"
 	"os"
 	"strings"
 
@@ -12,13 +13,6 @@ import (
 func CropAttachment(attachment *models.Attachment, width int, height int) (*string, error) {
 	var imgCroped image.Image
 	fileReaded, errWhenReadFile := os.Open(attachment.FilePath)
-	// cropedFileName, errWhenCreateCropedFileName := os.Create("croped_" + attachment.FileName)
-
-	// if errWhenCreateCropedFileName != nil {
-	// 	return nil, errWhenCreateCropedFileName
-	// }
-
-	// defer cropedFileName.Close()
 
 	if errWhenReadFile != nil {
 		return nil, errWhenReadFile
@@ -32,6 +26,8 @@ func CropAttachment(attachment *models.Attachment, width int, height int) (*stri
 			return nil, errWhenDecodeAttachment
 		}
 
+		defer fileReaded.Close()
+
 		imgCroped = imaging.Resize(pngImg, width, height, imaging.Lanczos)
 	case strings.Contains(attachment.FileType, "jpeg"):
 		jpegImg, _, errWhenDecodeAttachment := image.Decode(fileReaded)
@@ -39,6 +35,8 @@ func CropAttachment(attachment *models.Attachment, width int, height int) (*stri
 		if errWhenDecodeAttachment != nil {
 			return nil, errWhenDecodeAttachment
 		}
+
+		defer fileReaded.Close()
 
 		imgCroped = imaging.Resize(jpegImg, width, height, imaging.Lanczos)
 	}
@@ -48,6 +46,14 @@ func CropAttachment(attachment *models.Attachment, width int, height int) (*stri
 	if errWhenSavedImage != nil {
 		return nil, errWhenSavedImage
 	}
+
+	mailSent, errorWhenSendAnEmail := SendAnEmail("croped_"+attachment.FileName, "./uploads/croped_"+attachment.FileName)
+
+	if errorWhenSendAnEmail != nil {
+		return nil, errorWhenSendAnEmail
+	}
+
+	log.Println(mailSent)
 
 	responseMessage := "Attachment croped_" + attachment.FileName + " croped successfully ✅"
 	return &responseMessage, nil

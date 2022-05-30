@@ -22,6 +22,10 @@ type AttachmentController struct {
 	database service.AttachmentService
 }
 
+type PaymentController struct {
+	database service.PaymentService
+}
+
 var jwtMiddleware = middlewares.VerifyToken()
 
 func NewUserDatabaseInstance(router *gin.Engine, database service.UserService) error {
@@ -81,6 +85,16 @@ func NewAttachmentDatabaseInstance(router *gin.Engine, database service.Attachme
 	router.GET("/api/attachment/:attachmentId", jwtMiddleware, attachmentService.GetAttachmentById)
 	router.POST("/api/attachment/:projectId", jwtMiddleware, attachmentService.UploadAttachment)
 	router.DELETE("/api/attachment/:attachmentId", jwtMiddleware, attachmentService.DeleteAttachment)
+
+	return nil
+}
+
+func NewPaymentDatabaseInstance(router *gin.Engine, database service.PaymentService) error {
+	paymentService := &PaymentController{
+		database: database,
+	}
+
+	router.POST("/api/subscribe", jwtMiddleware, paymentService.Subscribe)
 
 	return nil
 }

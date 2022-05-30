@@ -6,6 +6,7 @@ networks:
 
 services:
   mysqlDatabase:
+    container_name: simplytodoGoMysqlDatabase
     image: mysql:latest
     networks:
       - simplytodoGo
@@ -25,6 +26,7 @@ services:
       - mysql-data:/data/db
       - "./procedure.sql:/docker-entrypoint-initdb.d/procedure.sql"
   simplytodo-go:
+    container_name: simplytodo-go
     depends_on:
       - mysqlDatabase
     image: simplytodo-go
