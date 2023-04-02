@@ -75,6 +75,8 @@ func (projectService *ProjectController) CreateProject(ctx *gin.Context) {
 	var project *models.Project
 	userId, ok := ctx.Params.Get("userId")
 
+	// projects, errWhenGetAllProjects := projectService.database.GetAllProjectsByUserId(userId)
+
 	if !ok {
 		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "userId not provided or incorrect"})
 		return

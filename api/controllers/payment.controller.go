@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 
@@ -58,7 +57,6 @@ func (paymentService *PaymentController) Subscribe(ctx *gin.Context) {
 	userAlreadySubscribe, userNotSubscribe := paymentService.database.GetSubscriptionByUserId(userId)
 
 	if userNotSubscribe != nil || !(len(userAlreadySubscribe.SubscriptionId) > 0) {
-		fmt.Println("ok cool")
 		stripeApiKey := os.Getenv("STRIPE_TEST_KEY")
 		stripe.Key = stripeApiKey
 
